@@ -1,3 +1,5 @@
+build-check: build check
+
 build:
 	cargo build
 
@@ -9,3 +11,7 @@ test:
 
 clean:
 	cargo clean
+
+check:
+	cargo fmt
+	cargo clippy
