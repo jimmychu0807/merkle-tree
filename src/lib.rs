@@ -35,13 +35,11 @@ type Hash = Vec<u8>;
 //   }
 // }
 
-pub struct MerkleTree<H: Digest> {
-  hasher: H,
-}
+pub struct MerkleTree {}
 
-impl<H: Digest> MerkleTree<H> {
-  pub fn new(hasher: H) -> Self {
-    Self { hasher }
+impl MerkleTree {
+  pub fn new() -> Self {
+    Self {}
   }
 
   pub fn merkle_root<I: Iterator>(&self, leaves: I) -> Hash
