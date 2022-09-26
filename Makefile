@@ -1,17 +1,19 @@
+cargo_cmd := cargo remote -r dev --
+
 build-check: build check
 
 build:
-	cargo build
+	${cargo_cmd} build
 
 run-example:
-	cargo run --example main
+	${cargo_cmd} run --example main
 
 test:
-	cargo test
+	${cargo_cmd} test
 
 clean:
-	cargo clean
+	${cargo_cmd} clean
 
 check:
-	cargo fmt
-	cargo clippy
+	${cargo_cmd} fmt
+	${cargo_cmd} clippy

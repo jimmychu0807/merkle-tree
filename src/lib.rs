@@ -1,68 +1,41 @@
-use blake2::{
-  Blake2s256, Digest,
-  digest::{ self, FixedOutputReset }
-};
-
 #[cfg(test)]
 mod tests;
 
-type Hash = Vec<u8>;
+// Re-export
+mod traits;
+pub use traits::{ Hash, Hasher };
 
-// pub trait Hasher {
-//   fn hash<I: AsRef<u8>>(input: I) -> Hash;
-//   fn hash_two<I: AsRef<u8>>(input1: I, input2: I) -> Hash;
-// }
+// Re-export
+pub mod blake2_hasher;
+pub mod sha3_hasher;
 
-// pub struct Blake2Hasher {}
+pub struct MerkleTree<H: Hasher> {
+  hasher: H,
+}
 
-// impl Blake2Hasher {
-//   pub fn new() -> Self {
-//     Blake2Hasher {}
-//   }
-// }
-
-// impl Hasher for Blake2Hasher {
-//   fn hash<I: AsRef<u8>>(input: I) -> Hash {
-//     Blake2s256::digest(input.as_ref()).to_vec()
-//   }
-
-//   fn hash_two<I: AsRef<u8>>(input1: I, input2: I) -> Hash {
-//     Blake2s256::new()
-//       .chain_update(input1)
-//       .chain_update(input2)
-//       .finalize()
-//       .to_vec()
-//   }
-// }
-
-pub struct MerkleTree {}
-
-impl MerkleTree {
-  pub fn new() -> Self {
-    Self {}
+impl<H: Hasher> MerkleTree<H> {
+  pub fn new(hasher: H) -> Self {
+    Self { hasher }
   }
 
   pub fn merkle_root<I: Iterator>(&self, leaves: I) -> Hash
-    where <I as Iterator>::Item: AsRef<[u8]>
+  where
+    <I as Iterator>::Item: AsRef<[u8]>,
   {
     // convert all data to hash
     let mut hashes: Vec<Hash> = leaves
-      .map(|l| Blake2s256::digest(l).to_vec())
+      .map(|l| self.hasher.hash(l))
       .collect();
 
     while hashes.len() > 1 {
       let mut new_hashes: Vec<Hash> = vec![];
-      let cnt = if hashes.len() % 2 == 0 {
-        hashes.len() / 2
-      } else {
-        hashes.len() / 2 + 1
-      };
+      let cnt = if hashes.len() % 2 == 0 { hashes.len() / 2 } else { hashes.len() / 2 + 1 };
       for i in 0..cnt {
         if i * 2 + 1 >= hashes.len() - 1 && hashes.len() % 2 != 0 {
           // This is the last node, and there is an odd number of node.
           new_hashes.push(hashes[i * 2].clone());
         } else {
-          new_hashes.push(self.hash_two(&hashes[i * 2], &hashes[i * 2 + 1]));
+          new_hashes.push(self.hasher.hash_two(&hashes[i * 2], &hashes[i * 2 + 1]));
         }
       }
 
@@ -72,13 +45,5 @@ impl MerkleTree {
     }
 
     hashes[0].to_vec()
-  }
-
-  fn hash_two(&self, input1: &[u8], input2: &[u8]) -> Hash {
-    Blake2s256::new()
-      .chain_update(input1)
-      .chain_update(input2)
-      .finalize()
-      .to_vec()
   }
 }
