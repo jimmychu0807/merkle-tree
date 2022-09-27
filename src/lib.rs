@@ -16,7 +16,7 @@ pub struct MerkleTree<H: Hasher> {
 }
 
 #[derive(Debug, Clone)]
-pub struct MerkleProof<N: AsRef<[u8]>> {
+pub struct MerkleProof<N: AsRef<[u8]> + Clone> {
   pub hashes: Vec<Hash>,
   pub node_number: usize,
   pub index: usize,
@@ -38,12 +38,12 @@ impl<H: Hasher> MerkleTree<H> {
     Self { hasher }
   }
 
-  pub fn merkle_root<I: Iterator>(&self, leaves: I) -> Hash
-  where
-    <I as Iterator>::Item: AsRef<[u8]>,
+  pub fn merkle_root<N>(&self, leaves: &[N]) -> Hash
+    where
+    N: AsRef<[u8]>
   {
     // convert all data to hash
-    let mut hashes: Vec<Hash> = leaves
+    let mut hashes: Vec<Hash> = leaves.iter()
       .map(|l| self.hasher.hash(l))
       .collect();
 
@@ -54,21 +54,21 @@ impl<H: Hasher> MerkleTree<H> {
     hashes[0].to_vec()
   }
 
-  pub fn merkle_proof<I: Iterator<Item = N>, N: AsRef<[u8]>>(&self, leaves: I, index: usize) -> Result<MerkleProof<N>, Error>
-  where
-    <I as Iterator>::Item: AsRef<[u8]>,
+  pub fn merkle_proof<N>(&self, leaves: &[N], index: usize) -> Result<MerkleProof<N>, Error>
+    where
+    N: AsRef<[u8]> + Clone
   {
     // General checking
-    let _check = if leaves.count() == 0 {
+    if leaves.is_empty() {
       Err(Error::EmptyLeaf)
-    } else if index >= leaves.count() {
+    } else if index >= leaves.len() {
       Err(Error::IndexOutOfBound)
     } else {
       Ok(())
     }?;
 
     let mut proof_hashes = vec![];
-    let mut hashes: Vec<Hash> = leaves.map(|l| self.hasher.hash(l).to_vec()).collect();
+    let mut hashes: Vec<Hash> = leaves.iter().map(|l| self.hasher.hash(l).to_vec()).collect();
 
     let mut current_node = index;
     while hashes.len() > 1 {
@@ -82,14 +82,14 @@ impl<H: Hasher> MerkleTree<H> {
       }
 
       hashes = self.up_one_level(&hashes);
-      current_node = current_node / 2;
+      current_node /= 2;
     }
 
     Ok(MerkleProof {
       hashes: proof_hashes,
-      node_number: leaves.count(),
+      node_number: leaves.len(),
       index,
-      node: leaves.nth(index).unwrap()
+      node: leaves[index].clone()
     })
   }
 
@@ -108,7 +108,10 @@ impl<H: Hasher> MerkleTree<H> {
     result
   }
 
-  pub fn verify_proof<N: AsRef<[u8]>>(&self, _root: &Hash, _proof: &MerkleProof<N>) -> bool {
+  pub fn verify_proof<N>(&self, root: &Hash, proof: &MerkleProof<N>) -> bool
+    where
+    N: AsRef<[u8]> + Clone
+  {
     true
   }
 }
