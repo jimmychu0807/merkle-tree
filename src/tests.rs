@@ -35,11 +35,7 @@ fn can_generate_root_proof_and_verify() {
 
   let tree = MerkleTree::new(Blake2Hasher::default());
 
-  let root = tree.merkle_root(&data);
-  let proof = tree
-    .merkle_proof(&data, 5)
-    .expect("Valid parameter for merkle proof should have been passed in.");
-  assert!(tree.verify_proof(&root, &proof));
+  assert!(tree.verify_proof(tree.merkle_root(&data), tree.merkle_proof(&data, 5).unwrap()));
 }
 
 #[test]
@@ -48,8 +44,6 @@ fn can_generate_root_proof_and_verify_for_non_lowest_tree_node() {
 
   let tree = MerkleTree::new(Blake2Hasher::default());
   let root = tree.merkle_root(&data);
-  let proof = tree
-    .merkle_proof(&data, 6)
-    .expect("Valid parameter for merkle proof should have been passed in.");
-  assert!(tree.verify_proof(&root, &proof));
+
+  assert!(tree.verify_proof(tree.merkle_root(&data), tree.merkle_proof(&data, 6).unwrap()));
 }
