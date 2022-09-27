@@ -21,6 +21,15 @@ fn main() {
   let root7 = merkle_tree.merkle_root(&data7);
   println!("merkle root: {:?}", hex::encode(&root7));
 
+  let proof1_0 = merkle_tree.merkle_proof(&data1, 0);
+  println!("merkle proof: {:?}", proof1_0);
+
+  let proof2_1 = merkle_tree.merkle_proof(&data2, 0);
+  println!("merkle proof: {:?}", proof2_1);
+
   let proof7_5 = merkle_tree.merkle_proof(&data7, 5);
   println!("merkle proof: {:?}", proof7_5);
+
+  let proof7_6 = merkle_tree.merkle_proof(&data7, 6);
+  println!("merkle proof: {:?}", proof7_6);
 }

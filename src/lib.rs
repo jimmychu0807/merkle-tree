@@ -112,6 +112,33 @@ impl<H: Hasher> MerkleTree<H> {
     where
     N: AsRef<[u8]> + Clone
   {
-    true
+    let mut result_hash = self.hasher.hash(&proof.node);
+    let mut current_level_node_num = proof.node_number;
+    let mut index = proof.index;
+    let mut hashes = proof.hashes.clone();
+
+    while current_level_node_num > 1 {
+      let node_hash = hashes.remove(0);
+      result_hash = if index % 2 == 0 {
+        self.hasher.hash_two(result_hash, node_hash)
+      } else {
+        self.hasher.hash_two(node_hash, result_hash)
+      };
+
+      index /= 2;
+      current_level_node_num = if current_level_node_num % 2 == 0 {
+        current_level_node_num / 2
+      } else {
+        current_level_node_num / 2 + 1
+      };
+    }
+
+    // A few housekeeping check
+    // 1. There should be no more entry in `hashes`
+    if !hashes.is_empty() {
+      false
+    } else {
+      root.to_vec() == result_hash
+    }
   }
 }

@@ -33,3 +33,24 @@ fn finding_merkle_root_of_seven_nodes() {
   let root = tree.merkle_root(&data);
 }
 
+#[test]
+fn can_generate_root_proof_and_verify() {
+  let data = vec![b"a", b"b", b"c", b"d", b"e", b"f", b"g"];
+
+  let tree = MerkleTree::new(Blake2Hasher::default());
+
+  let root = tree.merkle_root(&data);
+  let proof = tree.merkle_proof(&data, 5).expect("Valid parameter for merkle proof should have been passed in.");
+  assert!(tree.verify_proof(&root, &proof));
+}
+
+#[test]
+fn can_generate_root_proof_and_verify_for_non_lowest_tree_node() {
+  let data = vec![b"a", b"b", b"c", b"d", b"e", b"f", b"g"];
+
+  let tree = MerkleTree::new(Blake2Hasher::default());
+
+  let root = tree.merkle_root(&data);
+  let proof = tree.merkle_proof(&data, 6).expect("Valid parameter for merkle proof should have been passed in.");
+  assert!(tree.verify_proof(&root, &proof));
+}
