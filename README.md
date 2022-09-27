@@ -21,7 +21,7 @@ Implement a [Merkle tree](https://en.wikipedia.org/wiki/Merkle_tree) and functio
         struct MerkleProof<T> {
           pub hashes: Vec<Hash>,
           pub num_of_leaves: usize,
-          pub leaf_index: usize,
+          pub index: usize,
           pub leaf_content: T
         }
         ```

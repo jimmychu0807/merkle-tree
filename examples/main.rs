@@ -10,7 +10,7 @@ fn main() {
   let data1 = vec![b"abc"];
   let data2 = vec![b"abc", b"bcd"];
   let data3 = vec![b"abc", b"bcd", b"cde"];
-  let data4 = vec![b"abc", b"bcd", b"cde", b"def", b"efg"];
+  let data7 = vec![b"a", b"b", b"c", b"d", b"e", b"f", b"g"];
 
   let merkle_tree = MerkleTree::new(Blake2Hasher::default());
   let root1 = merkle_tree.merkle_root(data1.iter());
@@ -19,9 +19,9 @@ fn main() {
   let root2 = merkle_tree.merkle_root(data2.iter());
   println!("merkle root: {:?}", hex::encode(&root2));
 
-  let root3 = merkle_tree.merkle_root(data3.iter());
-  println!("merkle root: {:?}", hex::encode(&root3));
+  let root7 = merkle_tree.merkle_root(data7.iter());
+  println!("merkle root: {:?}", hex::encode(&root7));
 
-  let root4 = merkle_tree.merkle_root(data4.iter());
-  println!("merkle root: {:?}", hex::encode(&root4));
+  let proof7_5 = merkle_tree.merkle_proof(data7.iter(), 5);
+  println!("merkle proof: {:?}", proof7_5);
 }

@@ -25,3 +25,12 @@ fn one_level_root_using_keccak256_hasher() {
   assert_eq!(root, Keccak256::digest(b"abc").to_vec());
 }
 
+#[test]
+fn finding_merkle_root_of_seven_nodes() {
+  let data = vec![b"a", b"b", b"c", b"d", b"e", b"f", b"g"];
+
+  let tree = MerkleTree::new(Blake2Hasher::default());
+  let root = tree.merkle_root(data.iter());
+  assert_eq!(root, Keccak256::digest(b"abc").to_vec());
+}
+
