@@ -1,11 +1,7 @@
-use crate::{
-  MerkleTree,
-  blake2_hasher::Blake2Hasher,
-  sha3_hasher::Keccak256Hasher,
-};
+use crate::{blake2_hasher::Blake2Hasher, sha3_hasher::Keccak256Hasher, MerkleTree};
 
-use blake2::{ Blake2s256, Digest };
-use sha3::{ Keccak256 };
+use blake2::{Blake2s256, Digest};
+use sha3::Keccak256;
 
 #[test]
 fn one_level_root_using_blake2_hasher() {
@@ -30,7 +26,7 @@ fn finding_merkle_root_of_seven_nodes() {
   let data = vec![b"a", b"b", b"c", b"d", b"e", b"f", b"g"];
 
   let tree = MerkleTree::new(Blake2Hasher::default());
-  let root = tree.merkle_root(&data);
+  let _root = tree.merkle_root(&data);
 }
 
 #[test]
@@ -40,7 +36,9 @@ fn can_generate_root_proof_and_verify() {
   let tree = MerkleTree::new(Blake2Hasher::default());
 
   let root = tree.merkle_root(&data);
-  let proof = tree.merkle_proof(&data, 5).expect("Valid parameter for merkle proof should have been passed in.");
+  let proof = tree
+    .merkle_proof(&data, 5)
+    .expect("Valid parameter for merkle proof should have been passed in.");
   assert!(tree.verify_proof(&root, &proof));
 }
 
@@ -49,8 +47,9 @@ fn can_generate_root_proof_and_verify_for_non_lowest_tree_node() {
   let data = vec![b"a", b"b", b"c", b"d", b"e", b"f", b"g"];
 
   let tree = MerkleTree::new(Blake2Hasher::default());
-
   let root = tree.merkle_root(&data);
-  let proof = tree.merkle_proof(&data, 6).expect("Valid parameter for merkle proof should have been passed in.");
+  let proof = tree
+    .merkle_proof(&data, 6)
+    .expect("Valid parameter for merkle proof should have been passed in.");
   assert!(tree.verify_proof(&root, &proof));
 }

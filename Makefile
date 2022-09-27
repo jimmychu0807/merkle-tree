@@ -15,5 +15,8 @@ clean:
 	${cargo_cmd} clean
 
 check:
-	${cargo_cmd} fmt
+	${cargo_cmd} fmt --check --all
 	${cargo_cmd} clippy
+
+fmt:
+	cargo fmt

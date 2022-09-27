@@ -1,14 +1,10 @@
 extern crate merkle_tree;
 
-use merkle_tree::{
-  MerkleTree,
-  blake2_hasher::Blake2Hasher,
-};
+use merkle_tree::{blake2_hasher::Blake2Hasher, MerkleTree};
 
 fn main() {
   let data1 = vec![b"abc"];
   let data2 = vec![b"abc", b"bcd"];
-  let data3 = vec![b"abc", b"bcd", b"cde"];
   let data7 = vec![b"a", b"b", b"c", b"d", b"e", b"f", b"g"];
 
   let merkle_tree = MerkleTree::new(Blake2Hasher::default());

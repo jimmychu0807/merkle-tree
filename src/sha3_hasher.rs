@@ -1,6 +1,6 @@
-use sha3::{ Keccak256, Digest };
+use sha3::{Digest, Keccak256};
 
-use crate::traits::{ Hash, Hasher };
+use crate::traits::{Hash, Hasher};
 
 pub struct Keccak256Hasher {}
 
@@ -22,10 +22,6 @@ impl Hasher for Keccak256Hasher {
   }
 
   fn hash_two<I: AsRef<[u8]>>(&self, input1: I, input2: I) -> Hash {
-    Keccak256::new()
-      .chain_update(input1)
-      .chain_update(input2)
-      .finalize()
-      .to_vec()
+    Keccak256::new().chain_update(input1).chain_update(input2).finalize().to_vec()
   }
 }
