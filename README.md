@@ -9,20 +9,21 @@ Implement a [Merkle tree](https://en.wikipedia.org/wiki/Merkle_tree) and functio
     ![tree.png](docs/assets/tree.png)
 
 - Supports the following calls:
-    - `fn merkle_root(leaves: Iterator) -> Hash`
+    - `fn new(hasher: Hasher) -> Self`
+    - `fn merkle_root<N>(&self, leaves: &[N]) -> Hash`
 
         This function constructs a root hash of a Binary Merkle Tree created from given leaves
 
-    - `fn merkle_proof(leaves: Iterator, leaf_index: usize) -> MerkleProof`
+    - `fn merkle_proof(&self, leaves: &[N], leaf_index: usize) -> Result<MerkleProof, Error>`
 
         This function constructs a Merkle Proof for leaf specified by the index, by first constructing a (partial) Merkle Tree and return a `struct` storing all elements required to prove the leaf item, and contains the following:
 
         ```rust
-        struct MerkleProof<T> {
+        pub struct MerkleProof<N: AsRef<[u8]> + Clone> {
           pub hashes: Vec<Hash>,
-          pub num_of_leaves: usize,
+          pub node_number: usize,
           pub index: usize,
-          pub leaf_content: T
+          pub node: N
         }
         ```
 
@@ -35,9 +36,10 @@ Implement a [Merkle tree](https://en.wikipedia.org/wiki/Merkle_tree) and functio
 
 ```rust
 let data = vec![b"abc", b"bcd", b"cde", b"def", b"efg"];
-let root = MerkleTree.merkle_root(&data);
-let proof = MerkleTree.merkle_proof(&data, 1);
-assert_eq!(MerkleTree.verify_proof(&root, &proof), true);
+let tree = MerkleTree::new(BlakeTwo256Hasher::default());
+let root = tree.merkle_root(&data);
+let proof = tree.merkle_proof(&data, 1).unwrap();
+assert!(tree.verify_proof(&root, &proof));
 ```
 
 ## References

@@ -12,12 +12,12 @@ pub use traits::{hash_to_str, hashes_to_str, Hash, Hasher};
 pub mod blake2_hasher;
 pub mod sha3_hasher;
 
-pub struct MerkleTree<H: Hasher> {
+pub struct MerkleTree<H> {
   hasher: H,
 }
 
 #[derive(Clone)]
-pub struct MerkleProof<N: AsRef<[u8]> + Clone> {
+pub struct MerkleProof<N> {
   pub hashes: Vec<Hash>,
   pub node_number: usize,
   pub index: usize,
@@ -146,5 +146,11 @@ impl<H: Hasher> MerkleTree<H> {
     } else {
       root.to_vec() == result_hash
     }
+  }
+}
+
+impl Default for MerkleTree<blake2_hasher::BlakeTwo256Hasher> {
+  fn default() -> Self {
+    Self::new(blake2_hasher::BlakeTwo256Hasher::default())
   }
 }

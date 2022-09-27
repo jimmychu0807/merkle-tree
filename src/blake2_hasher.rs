@@ -2,21 +2,21 @@ use blake2::{Blake2s256, Digest};
 
 use crate::traits::{Hash, Hasher};
 
-pub struct Blake2Hasher {}
+pub struct BlakeTwo256Hasher {}
 
-impl Default for Blake2Hasher {
+impl Default for BlakeTwo256Hasher {
   fn default() -> Self {
     Self::new()
   }
 }
 
-impl Blake2Hasher {
+impl BlakeTwo256Hasher {
   pub fn new() -> Self {
-    Blake2Hasher {}
+    BlakeTwo256Hasher {}
   }
 }
 
-impl Hasher for Blake2Hasher {
+impl Hasher for BlakeTwo256Hasher {
   fn hash<I: AsRef<[u8]>>(&self, input: I) -> Hash {
     Blake2s256::digest(input).to_vec()
   }
