@@ -1,6 +1,6 @@
 use blake2::{Blake2s256, Digest};
 
-use crate::traits::{Hash, Hasher};
+use crate::types::{Hash, Hasher};
 
 pub struct BlakeTwo256Hasher {}
 
