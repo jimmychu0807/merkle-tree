@@ -16,7 +16,7 @@ clean:
 
 check:
 	${cargo_cmd} fmt --check --all
-	${cargo_cmd} clippy
+	${cargo_cmd} clippy --all-targets
 
 fmt:
 	cargo fmt
