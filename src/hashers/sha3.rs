@@ -1,6 +1,6 @@
-use sha3::{Digest, Keccak256};
+use sha3_lib::{Digest, Keccak256};
 
-use crate::traits::{Hash, Hasher};
+use crate::types::{Hash, Hasher};
 
 pub struct Keccak256Hasher {}
 
