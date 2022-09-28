@@ -38,7 +38,7 @@ pub struct MerkleProof<N> {
   pub node: N,
 }
 
-impl<N: AsRef<[u8]> + Clone> Debug for MerkleProof<N> {
+impl<N: AsRef<[u8]>> Debug for MerkleProof<N> {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     f.debug_struct("MerkleProof")
       .field("hashes", &hashes_to_str(&self.hashes))
