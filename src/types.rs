@@ -3,7 +3,7 @@ use core::fmt::{self, Debug};
 use thiserror::Error;
 
 // Internal dependencies
-use crate::utils::hashes_to_str;
+use crate::utils::{hash_to_str, hashes_to_str};
 
 pub type Hash = Vec<u8>;
 
@@ -38,12 +38,13 @@ pub struct MerkleProof<N> {
   pub node: N,
 }
 
-impl<N: AsRef<[u8]> + Clone> Debug for MerkleProof<N> {
+impl<N: AsRef<[u8]>> Debug for MerkleProof<N> {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     f.debug_struct("MerkleProof")
       .field("hashes", &hashes_to_str(&self.hashes))
       .field("node_number", &self.node_number)
       .field("index", &self.index)
+      .field("node", &hash_to_str(&self.node.as_ref().to_vec()))
       .finish()
   }
 }

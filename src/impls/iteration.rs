@@ -54,13 +54,7 @@ impl<H: Hasher> MerkleTreeT for MerkleTreeIteration<H> {
       current_node /= 2;
     }
 
-    // Clones `leaves[index]`. This way we can prevent bounding additional `Clone` trait,
-    //   as opposed to doing `leaves[index].clone()` directly.
-    // let node_ref: &[u8] = leaves[index].as_ref();
-    // let mut node = vec![0; node_ref.len()];
-    // node[..].clone_from_slice(node_ref);
     let node = leaves[index].clone();
-
     Ok(MerkleProof { hashes: proof_hashes, node_number: leaves.len(), index, node })
   }
 
@@ -88,7 +82,6 @@ impl<H: Hasher> MerkleTreeT for MerkleTreeIteration<H> {
     }
 
     // A few housekeeping check
-    // 1. There should be no more entry in `hashes`
     if !hashes.is_empty() {
       false
     } else {
