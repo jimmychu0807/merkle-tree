@@ -1,6 +1,6 @@
 extern crate merkle_tree;
 
-use merkle_tree::{BlakeTwo256Hasher, MerkleTreeIteration};
+use merkle_tree::{hashers::BlakeTwo256Hasher, MerkleTree, MerkleTreeIteration};
 
 fn main() {
   let data1 = vec![b"abc"];

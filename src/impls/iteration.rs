@@ -1,5 +1,7 @@
-use crate::types::{ Hash, Hasher, MerkleTree as MerkleTreeT, MerkleProof, Error };
-use crate::hashers::BlakeTwo256Hasher;
+use crate::{
+  hashers::BlakeTwo256Hasher,
+  types::{Error, Hash, Hasher, MerkleProof, MerkleTree as MerkleTreeT},
+};
 
 pub struct MerkleTreeIteration<H> {
   hasher: H,
@@ -23,7 +25,7 @@ impl<H: Hasher> MerkleTreeT for MerkleTreeIteration<H> {
     hashes[0].to_vec()
   }
 
-  fn merkle_proof<N: AsRef<[u8]>>(&self, leaves: &[N], index: usize) -> Result<MerkleProof<N>, Error> {
+  fn merkle_proof<N: AsRef<[u8]> + Clone>(&self, leaves: &[N], index: usize) -> Result<MerkleProof<N>, Error> {
     // General checking
     if leaves.is_empty() {
       Err(Error::EmptyLeaf)
@@ -54,9 +56,10 @@ impl<H: Hasher> MerkleTreeT for MerkleTreeIteration<H> {
 
     // Clones `leaves[index]`. This way we can prevent bounding additional `Clone` trait,
     //   as opposed to doing `leaves[index].clone()` directly.
-    let node_ref: &[u8] = leaves[index].as_ref();
-    let mut node = vec![0; node_ref.len()];
-    node[..].clone_from_slice(node_ref);
+    // let node_ref: &[u8] = leaves[index].as_ref();
+    // let mut node = vec![0; node_ref.len()];
+    // node[..].clone_from_slice(node_ref);
+    let node = leaves[index].clone();
 
     Ok(MerkleProof { hashes: proof_hashes, node_number: leaves.len(), index, node })
   }

@@ -53,8 +53,6 @@ pub trait MerkleTree {
 
   fn new(hasher: Self::Hasher) -> Self;
   fn merkle_root<N: AsRef<[u8]>>(&self, leaves: &[N]) -> Hash;
-  fn merkle_proof<N: AsRef<[u8]>>(&self, leaves: &[N], index: usize) -> Result<MerkleProof<N>, Error>;
-  fn verify_proof<N: AsRef<[u8]>>(&self, root: &Hash, proof: &MerkleProof<N>) -> bool
-  where
-    N: AsRef<[u8]> + Clone;
+  fn merkle_proof<N: AsRef<[u8]> + Clone>(&self, leaves: &[N], index: usize) -> Result<MerkleProof<N>, Error>;
+  fn verify_proof<N: AsRef<[u8]>>(&self, root: &Hash, proof: &MerkleProof<N>) -> bool;
 }
