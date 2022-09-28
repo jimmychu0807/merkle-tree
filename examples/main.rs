@@ -1,13 +1,13 @@
 extern crate merkle_tree;
 
-use merkle_tree::{blake2_hasher::Blake2Hasher, MerkleTree};
+use merkle_tree::{blake2_hasher::BlakeTwo256Hasher, MerkleTree};
 
 fn main() {
   let data1 = vec![b"abc"];
   let data2 = vec![b"abc", b"bcd"];
   let data7 = vec![b"a", b"b", b"c", b"d", b"e", b"f", b"g"];
 
-  let merkle_tree = MerkleTree::new(Blake2Hasher::default());
+  let merkle_tree = MerkleTree::new(BlakeTwo256Hasher::default());
   let root1 = merkle_tree.merkle_root(&data1);
   println!("merkle root: {:?}", hex::encode(&root1));
 
