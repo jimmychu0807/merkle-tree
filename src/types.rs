@@ -7,7 +7,7 @@ use crate::utils::{hash_to_str, hashes_to_str};
 
 pub type Hash = Vec<u8>;
 
-#[derive(Error, Debug)]
+#[derive(Error, Debug, PartialEq)]
 pub enum Error {
   #[error("Empty leaf")]
   EmptyLeaf,
@@ -31,7 +31,8 @@ pub trait Hasher {
   }
 }
 
-pub struct MerkleProof<N> {
+#[derive(PartialEq)]
+pub struct MerkleProof<N: AsRef<[u8]>> {
   pub hashes: Vec<Hash>,
   pub node_number: usize,
   pub index: usize,
@@ -53,7 +54,40 @@ pub trait MerkleTree {
   type Hasher: Hasher;
 
   fn new(hasher: Self::Hasher) -> Self;
+  fn get_hasher(&self) -> &Self::Hasher;
   fn merkle_root<N: AsRef<[u8]>>(&self, leaves: &[N]) -> Hash;
   fn merkle_proof<N: AsRef<[u8]> + Clone>(&self, leaves: &[N], index: usize) -> Result<MerkleProof<N>, Error>;
-  fn verify_proof<N: AsRef<[u8]>>(&self, root: &Hash, proof: &MerkleProof<N>) -> bool;
+
+  fn verify_proof<N: AsRef<[u8]>>(&self, root: &Hash, proof: &MerkleProof<N>) -> bool {
+    let hasher = self.get_hasher();
+
+    let mut result_hash = hasher.hash(&proof.node);
+    let mut current_level_node_num = proof.node_number;
+    let mut index = proof.index;
+    let mut hashes = proof.hashes.clone();
+
+    while current_level_node_num > 1 && !hashes.is_empty() {
+      result_hash = if index % 2 != 0 {
+        // `result_hash` is a right node.
+        hasher.hash_two(hashes.remove(0), result_hash)
+      } else if index != current_level_node_num - 1 {
+        // `result_hash` is a left node AND not the last node
+        hasher.hash_two(result_hash, hashes.remove(0))
+      } else {
+        result_hash
+      };
+
+      index /= 2;
+
+      current_level_node_num =
+        if current_level_node_num % 2 == 0 { current_level_node_num / 2 } else { current_level_node_num / 2 + 1 };
+    }
+
+    // A few housekeeping check
+    if !hashes.is_empty() {
+      false
+    } else {
+      root.to_vec() == result_hash
+    }
+  }
 }
