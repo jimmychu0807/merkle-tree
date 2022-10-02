@@ -14,6 +14,10 @@ impl<H: Hasher> MerkleTreeT for MerkleTreeRecursion<H> {
     Self { hasher }
   }
 
+  fn get_hasher(&self) -> &Self::Hasher {
+    &self.hasher
+  }
+
   fn merkle_root<N: AsRef<[u8]>>(&self, leaves: &[N]) -> Hash {
     if leaves.len() == 1 {
       // Terminal case
@@ -21,26 +25,64 @@ impl<H: Hasher> MerkleTreeT for MerkleTreeRecursion<H> {
     }
 
     let left_node_num = find_left_node_num(leaves);
-
     let left_root = self.merkle_root(&leaves[..left_node_num]);
-    #[cfg(feature = "logging")]
-    log::trace!("left_root: {:?}", crate::utils::hash_to_str(&left_root));
-
     let right_root = self.merkle_root(&leaves[left_node_num..]);
-    #[cfg(feature = "logging")]
-    log::trace!("right_root: {:?}", crate::utils::hash_to_str(&right_root));
-
     self.hasher.hash_two(left_root, right_root)
   }
 
   fn merkle_proof<N: AsRef<[u8]> + Clone>(&self, leaves: &[N], index: usize) -> Result<MerkleProof<N>, Error> {
-    // TODO
-    Err(Error::Unknown)
-  }
 
-  fn verify_proof<N: AsRef<[u8]>>(&self, root: &Hash, proof: &MerkleProof<N>) -> bool {
-    // TODO
-    false
+    let mut hashes = vec![];
+
+    self.merkle_proof_rec(leaves, Some(index), &mut hashes);
+
+    Ok(MerkleProof { hashes, node_number: leaves.len(), index, node: leaves[index].clone() })
+  }
+}
+
+impl<H: Hasher> MerkleTreeRecursion<H> {
+  fn merkle_proof_rec<N: AsRef<[u8]> + Clone>(
+    &self,
+    leaves: &[N],
+    target: Option<usize>,
+    hashes: &mut Vec<Hash>,
+  ) -> Hash {
+    if leaves.len() == 1 {
+      return self.hasher.hash(&leaves[0])
+    }
+
+    let left_node_num = find_left_node_num(leaves);
+
+    let left_tree_target = if let Some(target) = target {
+      if target < left_node_num {
+        Some(target)
+      } else {
+        None
+      }
+    } else {
+      None
+    };
+
+    let left_root = self.merkle_proof_rec(&leaves[..left_node_num], left_tree_target, hashes);
+
+    let right_tree_target = if let Some(target) = target {
+      if target >= left_node_num {
+        Some(target - left_node_num)
+      } else {
+        None
+      }
+    } else {
+      None
+    };
+
+    let right_root = self.merkle_proof_rec(&leaves[left_node_num..], right_tree_target, hashes);
+
+    match target {
+      Some(target) => hashes.push(if target < left_node_num { right_root.clone() } else { left_root.clone() }),
+      None => {}
+    }
+
+    self.hasher.hash_two(left_root, right_root)
   }
 }
 

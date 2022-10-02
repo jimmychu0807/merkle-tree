@@ -8,6 +8,7 @@ use crate::{
 use blake2::{Blake2s256, Digest};
 use sha3_lib::Keccak256;
 
+#[allow(dead_code)]
 fn init_test(f: fn()) {
   #[cfg(feature = "logging")]
   env_logger::try_init();

@@ -14,6 +14,10 @@ impl<H: Hasher> MerkleTreeT for MerkleTreeIteration<H> {
     Self { hasher }
   }
 
+  fn get_hasher(&self) -> &Self::Hasher {
+    &self.hasher
+  }
+
   fn merkle_root<N: AsRef<[u8]>>(&self, leaves: &[N]) -> Hash {
     // convert all data to hash
     let mut hashes: Vec<Hash> = leaves.iter().map(|l| self.hasher.hash(l)).collect();
@@ -62,37 +66,6 @@ impl<H: Hasher> MerkleTreeT for MerkleTreeIteration<H> {
 
     let node = leaves[index].clone();
     Ok(MerkleProof { hashes: proof_hashes, node_number: leaves.len(), index, node })
-  }
-
-  fn verify_proof<N: AsRef<[u8]>>(&self, root: &Hash, proof: &MerkleProof<N>) -> bool {
-    let mut result_hash = self.hasher.hash(&proof.node);
-    let mut current_level_node_num = proof.node_number;
-    let mut index = proof.index;
-    let mut hashes = proof.hashes.clone();
-
-    while current_level_node_num > 1 && !hashes.is_empty() {
-      result_hash = if index % 2 != 0 {
-        // `result_hash` is a right node.
-        self.hasher.hash_two(hashes.remove(0), result_hash)
-      } else if index != current_level_node_num - 1 {
-        // `result_hash` is a left node AND not the last node
-        self.hasher.hash_two(result_hash, hashes.remove(0))
-      } else {
-        result_hash
-      };
-
-      index /= 2;
-
-      current_level_node_num =
-        if current_level_node_num % 2 == 0 { current_level_node_num / 2 } else { current_level_node_num / 2 + 1 };
-    }
-
-    // A few housekeeping check
-    if !hashes.is_empty() {
-      false
-    } else {
-      root.to_vec() == result_hash
-    }
   }
 }
 
