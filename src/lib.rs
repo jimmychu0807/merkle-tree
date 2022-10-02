@@ -1,6 +1,3 @@
-#[cfg(test)]
-mod tests;
-
 // Re-export
 pub mod types;
 pub use types::{Hash, Hasher, MerkleTree};

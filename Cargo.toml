@@ -10,3 +10,8 @@ blake2 = { version = "^0.10.4" }
 hex = { version = "^0.4" }
 sha3_lib = { package = "sha3", version = "^0.10.5" }
 thiserror = { version = "^1.0" }
+log = { version = "^0.4", optional = true }
+env_logger = { version = "^0.9.1", optional = true }
+
+[features]
+logging = ["dep:log", "dep:env_logger"]
