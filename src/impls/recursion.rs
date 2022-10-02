@@ -31,7 +31,6 @@ impl<H: Hasher> MerkleTreeT for MerkleTreeRecursion<H> {
   }
 
   fn merkle_proof<N: AsRef<[u8]> + Clone>(&self, leaves: &[N], index: usize) -> Result<MerkleProof<N>, Error> {
-
     let mut hashes = vec![];
 
     self.merkle_proof_rec(leaves, Some(index), &mut hashes);

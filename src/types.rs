@@ -61,7 +61,6 @@ pub trait MerkleTree {
   fn verify_proof<N: AsRef<[u8]>>(&self, root: &Hash, proof: &MerkleProof<N>) -> bool {
     let hasher = self.get_hasher();
 
-
     let mut result_hash = hasher.hash(&proof.node);
     let mut current_level_node_num = proof.node_number;
     let mut index = proof.index;
