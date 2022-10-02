@@ -1,0 +1,29 @@
+name: Build, Check, and Test
+
+on:
+  pull_request:
+    branch: [main]
+  push:
+    branch: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build_and_test:
+    name: Rust project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly-2022-05-12
+          override: true
+          components: rustfmt, clippy
+      - run: |
+          make build-check-test

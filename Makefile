@@ -1,6 +1,9 @@
-cargo_cmd := cargo remote -r dev --
+# cargo_cmd := cargo remote -r dev --
+cargo_cmd := cargo
 
 build-check: build check
+
+build-check-test: build-check test
 
 build:
 	${cargo_cmd} build
