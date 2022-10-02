@@ -19,8 +19,14 @@ impl<H: Hasher> MerkleTreeT for MerkleTreeIteration<H> {
     let mut hashes: Vec<Hash> = leaves.iter().map(|l| self.hasher.hash(l)).collect();
 
     while hashes.len() > 1 {
+      #[cfg(feature = "logging")]
+      log::trace!("{:?}", crate::utils::hashes_to_str(&hashes));
+
       hashes = self.up_one_level(&hashes);
     }
+
+    #[cfg(feature = "logging")]
+    log::trace!("merkle_root: {:?}", crate::utils::hash_to_str(&hashes[0]));
 
     hashes[0].to_vec()
   }
